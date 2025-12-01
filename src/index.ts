@@ -1,6 +1,7 @@
 export { default as ApexGanttChart } from "./ApexGanttChart";
 export { useGanttEvents } from "./hooks/useGanttEvents";
 export { useGanttData } from "./hooks/useGanttData";
+export { setApexGanttLicense } from "./utils";
 
 // re-export types from apexgantt
 export type {

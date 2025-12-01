@@ -26,7 +26,6 @@ export default {
       tsconfig: "./tsconfig.json",
       declaration: true,
       declarationDir: "dist",
-      exclude: ["**/__tests__/**", "**/*.test.ts", "**/*.test.tsx"],
     }),
   ],
   external: ["react", "react-dom", "apexgantt"],

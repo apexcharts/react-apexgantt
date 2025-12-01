@@ -10,6 +10,32 @@ npm install react-apexgantt apexgantt
 yarn add react-apexgantt apexgantt
 ```
 
+## License Setup
+
+If you have a commercial license, set it once at app initialization before rendering any charts:
+
+```tsx
+import { setApexGanttLicense } from "react-apexgantt";
+
+// call this at the top of your app
+setApexGanttLicense("your-license-key-here");
+```
+
+**Example with React app entry point:**
+
+```tsx
+// main.tsx or index.tsx
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { setApexGanttLicense } from "react-apexgantt";
+import App from "./App";
+
+// set license before rendering
+setApexGanttLicense("your-license-key-here");
+
+ReactDOM.createRoot(document.getElementById("root")!).render();
+```
+
 ## Quick Start
 
 ```tsx

@@ -128,9 +128,8 @@ const EventsExample: React.FC = () => {
                   marginBottom: '8px',
                   background: '#f5f5f5',
                   borderRadius: '4px',
-                  borderLeft: `3px solid ${
-                    log.type === 'drag' ? '#4caf50' : log.type === 'resize' ? '#ff9800' : '#2196f3'
-                  }`,
+                  borderLeft: `3px solid ${log.type === 'drag' ? '#4caf50' : log.type === 'resize' ? '#ff9800' : '#2196f3'
+                    }`,
                 }}
               >
                 <div style={{ fontSize: '11px', color: '#999', marginBottom: '4px' }}>

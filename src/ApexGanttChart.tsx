@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import ApexGantt, { GanttEvents } from 'apexgantt';
+import type { TaskInput, GanttUserOptions, ViewMode, ThemeMode } from 'apexgantt';
 import type { ApexGanttChartProps, ApexGanttHandle } from './types';
+import { deepEqual } from './utils';
 
 const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
   (
@@ -24,6 +26,17 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
   ) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const chartRef = useRef<ApexGantt | null>(null);
+
+    // store previous props for comparison
+    const prevPropsRef = useRef<{
+      tasks: TaskInput[];
+      options: Omit<GanttUserOptions, 'series'>;
+      width: string | number | undefined;
+      height: string | number | undefined;
+      viewMode: ViewMode | undefined;
+      theme: ThemeMode | undefined;
+    } | null>(null);
+
     const eventHandlersRef = useRef({
       onTaskUpdate,
       onTaskUpdateSuccess,
@@ -33,7 +46,7 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       onTaskResized,
     });
 
-    // keep event handlers up to date without triggering re-renders
+    // keep event handlers up to date
     useEffect(() => {
       eventHandlersRef.current = {
         onTaskUpdate,
@@ -73,7 +86,6 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
     useEffect(() => {
       if (!containerRef.current) return;
 
-      // merge convenience props with options
       const ganttOptions = {
         ...options,
         series: tasks,
@@ -83,42 +95,42 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
         ...(theme !== undefined && { theme }),
       };
 
-      // create chart instance
       chartRef.current = new ApexGantt(containerRef.current, ganttOptions);
       chartRef.current.render();
 
-      // setup event listeners
+      // store initial props
+      prevPropsRef.current = { tasks, options, width, height, viewMode, theme };
+
       const container = containerRef.current;
-      const handlers = eventHandlersRef.current;
 
       const taskUpdateHandler = (e: Event) => {
         const customEvent = e as CustomEvent<any>;
-        handlers.onTaskUpdate?.(customEvent.detail);
+        eventHandlersRef.current.onTaskUpdate?.(customEvent.detail);
       };
 
       const taskUpdateSuccessHandler = (e: Event) => {
         const customEvent = e as CustomEvent<any>;
-        handlers.onTaskUpdateSuccess?.(customEvent.detail);
+        eventHandlersRef.current.onTaskUpdateSuccess?.(customEvent.detail);
       };
 
       const taskUpdateErrorHandler = (e: Event) => {
         const customEvent = e as CustomEvent<any>;
-        handlers.onTaskUpdateError?.(customEvent.detail);
+        eventHandlersRef.current.onTaskUpdateError?.(customEvent.detail);
       };
 
       const taskValidationErrorHandler = (e: Event) => {
         const customEvent = e as CustomEvent<any>;
-        handlers.onTaskValidationError?.(customEvent.detail);
+        eventHandlersRef.current.onTaskValidationError?.(customEvent.detail);
       };
 
       const taskDraggedHandler = (e: Event) => {
         const customEvent = e as CustomEvent<any>;
-        handlers.onTaskDragged?.(customEvent.detail);
+        eventHandlersRef.current.onTaskDragged?.(customEvent.detail);
       };
 
       const taskResizedHandler = (e: Event) => {
         const customEvent = e as CustomEvent<any>;
-        handlers.onTaskResized?.(customEvent.detail);
+        eventHandlersRef.current.onTaskResized?.(customEvent.detail);
       };
 
       container.addEventListener(GanttEvents.TASK_UPDATE, taskUpdateHandler);
@@ -128,7 +140,6 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       container.addEventListener(GanttEvents.TASK_DRAGGED, taskDraggedHandler);
       container.addEventListener(GanttEvents.TASK_RESIZED, taskResizedHandler);
 
-      // cleanup
       return () => {
         container.removeEventListener(GanttEvents.TASK_UPDATE, taskUpdateHandler);
         container.removeEventListener(GanttEvents.TASK_UPDATE_SUCCESS, taskUpdateSuccessHandler);
@@ -136,15 +147,32 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
         container.removeEventListener(GanttEvents.TASK_VALIDATION_ERROR, taskValidationErrorHandler);
         container.removeEventListener(GanttEvents.TASK_DRAGGED, taskDraggedHandler);
         container.removeEventListener(GanttEvents.TASK_RESIZED, taskResizedHandler);
-        
+
         chartRef.current?.destroy();
         chartRef.current = null;
       };
-    }, []); // only run once on mount
+    }, []);
 
-    // handle updates to tasks and options
+    // handle prop updates - only call update() when props actually change
     useEffect(() => {
-      if (!chartRef.current) return;
+      if (!chartRef.current || !prevPropsRef.current) return;
+
+      const prev = prevPropsRef.current;
+
+      // check if anything actually changed
+      const tasksChanged = !deepEqual(prev.tasks, tasks);
+      const optionsChanged = !deepEqual(prev.options, options);
+      const widthChanged = prev.width !== width;
+      const heightChanged = prev.height !== height;
+      const viewModeChanged = prev.viewMode !== viewMode;
+      const themeChanged = prev.theme !== theme;
+
+      if (!tasksChanged && !optionsChanged && !widthChanged && !heightChanged && !viewModeChanged && !themeChanged) {
+        return;
+      }
+
+      // update stored props
+      prevPropsRef.current = { tasks, options, width, height, viewMode, theme };
 
       const ganttOptions = {
         ...options,
@@ -159,8 +187,8 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
     }, [tasks, options, width, height, viewMode, theme]);
 
     return (
-      <div 
-        ref={containerRef} 
+      <div
+        ref={containerRef}
         className={className}
         style={style}
       />

@@ -23,5 +23,14 @@
     "react": {
       "version": "detect"
     }
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.cjs"],
+      "env": {
+        "node": true,
+        "commonjs": true
+      }
+    }
+  ]
 }
