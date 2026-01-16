@@ -23,12 +23,12 @@
     "project-management",
     "timeline"
   ],
-  "author": "",
+  "author": "ApexCharts",
   "license": "See License in LICENSE",
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
-    "apexgantt": "^3.4.0"
+    "apexgantt": "^3.4.1"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^25.0.7",
