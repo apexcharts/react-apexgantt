@@ -1,18 +1,20 @@
-export function deepEqual(a: any, b: any): boolean {
+export function deepEqual(a: unknown, b: unknown): boolean {
   if (a === b) return true;
   if (a === null || b === null) return false;
   if (typeof a !== typeof b) return false;
   if (typeof a !== "object") return false;
   if (Array.isArray(a) !== Array.isArray(b)) return false;
 
-  const keysA = Object.keys(a);
-  const keysB = Object.keys(b);
+  const objA = a as Record<string, unknown>;
+  const objB = b as Record<string, unknown>;
+  const keysA = Object.keys(objA);
+  const keysB = Object.keys(objB);
 
   if (keysA.length !== keysB.length) return false;
 
   for (const key of keysA) {
     if (!keysB.includes(key)) return false;
-    if (!deepEqual(a[key], b[key])) return false;
+    if (!deepEqual(objA[key], objB[key])) return false;
   }
 
   return true;
@@ -33,7 +35,7 @@ export function deepEqual(a: any, b: any): boolean {
  * ```
  */
 export function setApexGanttLicense(licenseKey: string): void {
-  if (typeof window !== "undefined" && (window as any).ApexGantt) {
-    (window as any).ApexGantt.setLicense(licenseKey);
+  if (typeof window !== "undefined" && (window as { ApexGantt?: { setLicense: (key: string) => void } }).ApexGantt) {
+    (window as { ApexGantt?: { setLicense: (key: string) => void } }).ApexGantt!.setLicense(licenseKey);
   }
 }

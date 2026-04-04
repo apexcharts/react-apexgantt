@@ -3,7 +3,7 @@ import type { TaskInput, ParsingConfig } from "apexgantt";
 import { DataParser } from "apexgantt";
 
 interface UseGanttDataOptions {
-  data: any[];
+  data: unknown[];
   parsing?: ParsingConfig;
 }
 

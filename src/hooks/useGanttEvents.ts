@@ -1,14 +1,10 @@
 import { useCallback, useRef } from "react";
-import type {
-  TaskUpdateEventDetail,
-  TaskDraggedEventDetail,
-  TaskResizedEventDetail,
-} from "apexgantt";
+import type { GanttEventMap } from "apexgantt";
 
 interface UseGanttEventsOptions {
-  onTaskUpdate?: (detail: TaskUpdateEventDetail) => void;
-  onTaskDragged?: (detail: TaskDraggedEventDetail) => void;
-  onTaskResized?: (detail: TaskResizedEventDetail) => void;
+  onTaskUpdate?: (detail: GanttEventMap['taskUpdate']['detail']) => void;
+  onTaskDragged?: (detail: GanttEventMap['taskDragged']['detail']) => void;
+  onTaskResized?: (detail: GanttEventMap['taskResized']['detail']) => void;
 }
 
 /**
@@ -20,15 +16,15 @@ export function useGanttEvents(options: UseGanttEventsOptions) {
   // keep options up to date
   optionsRef.current = options;
 
-  const handleTaskUpdate = useCallback((detail: TaskUpdateEventDetail) => {
+  const handleTaskUpdate = useCallback((detail: GanttEventMap['taskUpdate']['detail']) => {
     optionsRef.current.onTaskUpdate?.(detail);
   }, []);
 
-  const handleTaskDragged = useCallback((detail: TaskDraggedEventDetail) => {
+  const handleTaskDragged = useCallback((detail: GanttEventMap['taskDragged']['detail']) => {
     optionsRef.current.onTaskDragged?.(detail);
   }, []);
 
-  const handleTaskResized = useCallback((detail: TaskResizedEventDetail) => {
+  const handleTaskResized = useCallback((detail: GanttEventMap['taskResized']['detail']) => {
     optionsRef.current.onTaskResized?.(detail);
   }, []);
 

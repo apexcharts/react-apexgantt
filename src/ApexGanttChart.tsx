@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import ApexGantt, { GanttEvents } from 'apexgantt';
-import type { TaskInput, GanttUserOptions, ViewMode, ThemeMode } from 'apexgantt';
+import type { GanttEventMap } from 'apexgantt';
 import type { ApexGanttChartProps, ApexGanttHandle } from './types';
 import { deepEqual } from './utils';
 
@@ -19,6 +19,8 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       onTaskValidationError,
       onTaskDragged,
       onTaskResized,
+      onSelectionChange,
+      onDependencyArrowUpdate,
       className,
       style,
     },
@@ -28,14 +30,10 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
     const chartRef = useRef<ApexGantt | null>(null);
 
     // store previous props for comparison
-    const prevPropsRef = useRef<{
-      tasks: TaskInput[];
-      options: Omit<GanttUserOptions, 'series'>;
-      width: string | number | undefined;
-      height: string | number | undefined;
-      viewMode: ViewMode | undefined;
-      theme: ThemeMode | undefined;
-    } | null>(null);
+    const prevPropsRef = useRef<Pick<
+      ApexGanttChartProps,
+      'tasks' | 'options' | 'width' | 'height' | 'viewMode' | 'theme'
+    > | null>(null);
 
     const eventHandlersRef = useRef({
       onTaskUpdate,
@@ -44,6 +42,8 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       onTaskValidationError,
       onTaskDragged,
       onTaskResized,
+      onSelectionChange,
+      onDependencyArrowUpdate,
     });
 
     // keep event handlers up to date
@@ -55,6 +55,8 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
         onTaskValidationError,
         onTaskDragged,
         onTaskResized,
+        onSelectionChange,
+        onDependencyArrowUpdate,
       };
     });
 
@@ -104,33 +106,35 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       const container = containerRef.current;
 
       const taskUpdateHandler = (e: Event) => {
-        const customEvent = e as CustomEvent<any>;
-        eventHandlersRef.current.onTaskUpdate?.(customEvent.detail);
+        eventHandlersRef.current.onTaskUpdate?.((e as GanttEventMap['taskUpdate']).detail);
       };
 
       const taskUpdateSuccessHandler = (e: Event) => {
-        const customEvent = e as CustomEvent<any>;
-        eventHandlersRef.current.onTaskUpdateSuccess?.(customEvent.detail);
+        eventHandlersRef.current.onTaskUpdateSuccess?.((e as GanttEventMap['taskUpdateSuccess']).detail);
       };
 
       const taskUpdateErrorHandler = (e: Event) => {
-        const customEvent = e as CustomEvent<any>;
-        eventHandlersRef.current.onTaskUpdateError?.(customEvent.detail);
+        eventHandlersRef.current.onTaskUpdateError?.((e as GanttEventMap['taskUpdateError']).detail);
       };
 
       const taskValidationErrorHandler = (e: Event) => {
-        const customEvent = e as CustomEvent<any>;
-        eventHandlersRef.current.onTaskValidationError?.(customEvent.detail);
+        eventHandlersRef.current.onTaskValidationError?.((e as GanttEventMap['taskValidationError']).detail);
       };
 
       const taskDraggedHandler = (e: Event) => {
-        const customEvent = e as CustomEvent<any>;
-        eventHandlersRef.current.onTaskDragged?.(customEvent.detail);
+        eventHandlersRef.current.onTaskDragged?.((e as GanttEventMap['taskDragged']).detail);
       };
 
       const taskResizedHandler = (e: Event) => {
-        const customEvent = e as CustomEvent<any>;
-        eventHandlersRef.current.onTaskResized?.(customEvent.detail);
+        eventHandlersRef.current.onTaskResized?.((e as GanttEventMap['taskResized']).detail);
+      };
+
+      const selectionChangeHandler = (e: Event) => {
+        eventHandlersRef.current.onSelectionChange?.((e as GanttEventMap['selectionChange']).detail);
+      };
+
+      const dependencyArrowUpdateHandler = (e: Event) => {
+        eventHandlersRef.current.onDependencyArrowUpdate?.((e as GanttEventMap['dependency-arrow-update']).detail);
       };
 
       container.addEventListener(GanttEvents.TASK_UPDATE, taskUpdateHandler);
@@ -139,6 +143,8 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       container.addEventListener(GanttEvents.TASK_VALIDATION_ERROR, taskValidationErrorHandler);
       container.addEventListener(GanttEvents.TASK_DRAGGED, taskDraggedHandler);
       container.addEventListener(GanttEvents.TASK_RESIZED, taskResizedHandler);
+      container.addEventListener(GanttEvents.SELECTION_CHANGE, selectionChangeHandler);
+      container.addEventListener('dependency-arrow-update', dependencyArrowUpdateHandler);
 
       return () => {
         container.removeEventListener(GanttEvents.TASK_UPDATE, taskUpdateHandler);
@@ -147,11 +153,13 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
         container.removeEventListener(GanttEvents.TASK_VALIDATION_ERROR, taskValidationErrorHandler);
         container.removeEventListener(GanttEvents.TASK_DRAGGED, taskDraggedHandler);
         container.removeEventListener(GanttEvents.TASK_RESIZED, taskResizedHandler);
+        container.removeEventListener(GanttEvents.SELECTION_CHANGE, selectionChangeHandler);
+        container.removeEventListener('dependency-arrow-update', dependencyArrowUpdateHandler);
 
         chartRef.current?.destroy();
         chartRef.current = null;
       };
-    }, []);
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     // handle prop updates - only call update() when props actually change
     useEffect(() => {
