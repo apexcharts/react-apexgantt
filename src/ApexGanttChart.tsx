@@ -134,7 +134,7 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       };
 
       const dependencyArrowUpdateHandler = (e: Event) => {
-        eventHandlersRef.current.onDependencyArrowUpdate?.((e as GanttEventMap['dependency-arrow-update']).detail);
+        eventHandlersRef.current.onDependencyArrowUpdate?.((e as GanttEventMap['dependencyArrowUpdate']).detail);
       };
 
       container.addEventListener(GanttEvents.TASK_UPDATE, taskUpdateHandler);
@@ -144,7 +144,7 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       container.addEventListener(GanttEvents.TASK_DRAGGED, taskDraggedHandler);
       container.addEventListener(GanttEvents.TASK_RESIZED, taskResizedHandler);
       container.addEventListener(GanttEvents.SELECTION_CHANGE, selectionChangeHandler);
-      container.addEventListener('dependency-arrow-update', dependencyArrowUpdateHandler);
+      container.addEventListener(GanttEvents.DEPENDENCY_ARROW_UPDATE, dependencyArrowUpdateHandler);
 
       return () => {
         container.removeEventListener(GanttEvents.TASK_UPDATE, taskUpdateHandler);
@@ -154,7 +154,7 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
         container.removeEventListener(GanttEvents.TASK_DRAGGED, taskDraggedHandler);
         container.removeEventListener(GanttEvents.TASK_RESIZED, taskResizedHandler);
         container.removeEventListener(GanttEvents.SELECTION_CHANGE, selectionChangeHandler);
-        container.removeEventListener('dependency-arrow-update', dependencyArrowUpdateHandler);
+        container.removeEventListener(GanttEvents.DEPENDENCY_ARROW_UPDATE, dependencyArrowUpdateHandler);
 
         chartRef.current?.destroy();
         chartRef.current = null;

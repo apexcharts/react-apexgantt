@@ -1,4 +1,10 @@
-import type { GanttUserOptions, GanttEventMap, ViewMode, ThemeMode, TaskInput } from "apexgantt";
+import type {
+  GanttUserOptions,
+  GanttEventMap,
+  ViewMode,
+  ThemeMode,
+  TaskInput,
+} from "apexgantt";
 import ApexGantt from "apexgantt";
 
 /**
@@ -27,21 +33,31 @@ export interface ApexGanttChartProps {
   theme?: ThemeMode;
 
   /** Fires when a task is being updated (before completion). */
-  onTaskUpdate?: (detail: GanttEventMap['taskUpdate']['detail']) => void;
+  onTaskUpdate?: (detail: GanttEventMap["taskUpdate"]["detail"]) => void;
   /** Fires after a task update completes successfully. */
-  onTaskUpdateSuccess?: (detail: GanttEventMap['taskUpdateSuccess']['detail']) => void;
+  onTaskUpdateSuccess?: (
+    detail: GanttEventMap["taskUpdateSuccess"]["detail"],
+  ) => void;
   /** Fires when a task update fails with an error. */
-  onTaskUpdateError?: (detail: GanttEventMap['taskUpdateError']['detail']) => void;
+  onTaskUpdateError?: (
+    detail: GanttEventMap["taskUpdateError"]["detail"],
+  ) => void;
   /** Fires when task form validation fails. */
-  onTaskValidationError?: (detail: GanttEventMap['taskValidationError']['detail']) => void;
+  onTaskValidationError?: (
+    detail: GanttEventMap["taskValidationError"]["detail"],
+  ) => void;
   /** Fires when a task bar is dragged to a new position. */
-  onTaskDragged?: (detail: GanttEventMap['taskDragged']['detail']) => void;
+  onTaskDragged?: (detail: GanttEventMap["taskDragged"]["detail"]) => void;
   /** Fires when a task bar is resized via its handles. */
-  onTaskResized?: (detail: GanttEventMap['taskResized']['detail']) => void;
+  onTaskResized?: (detail: GanttEventMap["taskResized"]["detail"]) => void;
   /** Fires when the set of selected tasks changes. */
-  onSelectionChange?: (detail: GanttEventMap['selectionChange']['detail']) => void;
+  onSelectionChange?: (
+    detail: GanttEventMap["selectionChange"]["detail"],
+  ) => void;
   /** Fires when a dependency arrow is created, moved, or deleted. */
-  onDependencyArrowUpdate?: (detail: GanttEventMap['dependency-arrow-update']['detail']) => void;
+  onDependencyArrowUpdate?: (
+    detail: GanttEventMap["dependencyArrowUpdate"]["detail"],
+  ) => void;
 
   /** CSS class name applied to the wrapper `<div>`. */
   className?: string;
