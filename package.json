@@ -1,5 +1,6 @@
 {
   "name": "react-apexgantt",
+  "type": "module",
   "version": "1.1.0",
   "description": "React wrapper for ApexGantt - A JavaScript library to create Gantt diagrams",
   "main": "dist/index.js",
@@ -25,8 +26,12 @@
   ],
   "author": "ApexCharts",
   "license": "See License in LICENSE",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/apexcharts/react-apexgantt"
+  },
   "peerDependencies": {
-    "apexgantt": ">=3.10.0",
+    "apexgantt": ">=3.10.2",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },
