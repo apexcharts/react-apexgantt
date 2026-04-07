@@ -84,10 +84,14 @@ function App() {
 
 | Event                 | Type               | Description                        |
 | --------------------- | ------------------ | ---------------------------------- |
-| `onTaskUpdate`        | `(detail) => void` | Fired when a task is being updated |
-| `onTaskUpdateSuccess` | `(detail) => void` | Fired after successful task update |
-| `onTaskDragged`       | `(detail) => void` | Fired when a task is dragged       |
-| `onTaskResized`       | `(detail) => void` | Fired when a task is resized       |
+| `onTaskUpdate`            | `(detail) => void` | Fired when a task is being updated (before completion) |
+| `onTaskUpdateSuccess`     | `(detail) => void` | Fired after successful task update          |
+| `onTaskUpdateError`       | `(detail) => void` | Fired when a task update fails              |
+| `onTaskValidationError`   | `(detail) => void` | Fired when task form validation fails       |
+| `onTaskDragged`           | `(detail) => void` | Fired when a task is dragged                |
+| `onTaskResized`           | `(detail) => void` | Fired when a task is resized                |
+| `onSelectionChange`       | `(detail) => void` | Fired when the set of selected tasks changes |
+| `onDependencyArrowUpdate` | `(detail) => void` | Fired when a dependency arrow is created, moved, or deleted |
 
 ### Ref Methods
 
@@ -100,6 +104,7 @@ ganttRef.current?.updateTask(taskId, data);
 ganttRef.current?.zoomIn();
 ganttRef.current?.zoomOut();
 ganttRef.current?.destroy();
+ganttRef.current?.getInstance();
 ```
 
 ## Custom Hooks
