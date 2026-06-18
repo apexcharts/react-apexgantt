@@ -1,8 +1,23 @@
-# React ApexGantt
+# React Gantt Chart Component — react-apexgantt
 
-React wrapper for [ApexGantt](https://github.com/apexcharts/apexgantt) - A JavaScript library to create interactive Gantt charts.
+A React Gantt chart component for interactive project timelines. Render tasks, dependencies, milestones, critical path, and baselines as a fully drag-and-drop schedule — with props-driven configuration, typed event callbacks, a `useGanttData` hook, and React 16.8+ support.
+
+📚 **Documentation:** [apexcharts.com/apexgantt/docs](https://apexcharts.com/apexgantt/docs/) · 🎬 **Live demos:** [apexcharts.com/apexgantt/demos](https://apexcharts.com/apexgantt/demos/) · 📦 **npm:** [react-apexgantt](https://www.npmjs.com/package/react-apexgantt) · 🌐 **Part of** [ApexGantt](https://apexcharts.com/apexgantt/) — one Gantt component for JavaScript, React, Angular, and Vue.
+
+## Features
+
+- Task dependencies and milestones
+- Critical path highlighting
+- Baselines (planned vs actual)
+- Multiple view modes: day, week, month, quarter, year
+- Drag-and-drop scheduling
+- Light and dark themes
+- Typed event callbacks and a `useGanttData` hook
+- TypeScript type definitions
 
 ## Installation
+
+Install the wrapper alongside the `apexgantt` core engine:
 
 ```bash
 npm install react-apexgantt apexgantt
@@ -148,3 +163,19 @@ The test app includes:
 - **Basic Example**: Simple Gantt with zoom controls
 - **Advanced Example**: Data parsing, view mode switching, theme toggle
 - **Events Example**: Interactive testing of drag, resize, and update events
+
+## Framework wrappers
+
+Using a different framework? Use the dedicated wrapper — all share the same core engine and task data model:
+
+- **JavaScript** — [`apexgantt`](https://www.npmjs.com/package/apexgantt) ([GitHub](https://github.com/apexcharts/apexgantt))
+- **Angular** — [`ngx-apexgantt`](https://www.npmjs.com/package/ngx-apexgantt) ([GitHub](https://github.com/apexcharts/ngx-apexgantt))
+- **Vue** — [`vue-apexgantt`](https://www.npmjs.com/package/vue-apexgantt) ([GitHub](https://github.com/apexcharts/vue-apexgantt))
+
+## License
+
+See [LICENSE](LICENSE) for details. Commercial licenses available at [apexcharts.com/pricing](https://apexcharts.com/pricing/).
+
+## About
+
+A React wrapper for [ApexGantt](https://github.com/apexcharts/apexgantt) — part of the [ApexCharts](https://apexcharts.com/) family, a Gantt chart component for JavaScript, React, Angular, and Vue with one consistent API across every framework wrapper.
