@@ -2,7 +2,7 @@
 
 A React Gantt chart component for interactive project timelines. Render tasks, dependencies, milestones, critical path, and baselines as a fully drag-and-drop schedule — with props-driven configuration, typed event callbacks, a `useGanttData` hook, and React 16.8+ support.
 
-📚 **Documentation:** [apexcharts.com/apexgantt/docs](https://apexcharts.com/apexgantt/docs/) · 🎬 **Live demos:** [apexcharts.com/apexgantt/demos](https://apexcharts.com/apexgantt/demos/) · 📦 **npm:** [react-apexgantt](https://www.npmjs.com/package/react-apexgantt) · 🌐 **Part of** [ApexGantt](https://apexcharts.com/apexgantt/) — one Gantt component for JavaScript, React, Angular, and Vue.
+📚 **Documentation:** [apexcharts.com/apexgantt/docs](https://apexcharts.com/apexgantt/docs/) · 🎬 **Live demos:** [apexcharts.com/apexgantt/demos](https://apexcharts.com/apexgantt/demos/) · 📦 **npm:** [react-apexgantt](https://www.npmjs.com/package/react-apexgantt) · 📖 **Guide:** [React Gantt Chart](https://apexcharts.com/react-gantt-chart/) · 🌐 **Part of** [ApexGantt](https://apexcharts.com/apexgantt/) — one Gantt component for JavaScript, React, Angular, and Vue.
 
 ## Features
 
