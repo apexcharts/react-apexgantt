@@ -1,7 +1,7 @@
 {
   "name": "react-apexgantt",
   "type": "module",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "React wrapper for ApexGantt - A JavaScript library to create Gantt diagrams",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -31,7 +31,7 @@
     "url": "https://github.com/apexcharts/react-apexgantt"
   },
   "peerDependencies": {
-    "apexgantt": ">=3.10.2",
+    "apexgantt": ">=3.11.0",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },
@@ -44,7 +44,7 @@
     "@types/react-dom": "^18.2.18",
     "@typescript-eslint/eslint-plugin": "^6.15.0",
     "@typescript-eslint/parser": "^6.15.0",
-    "apexgantt": "^3.10.2",
+    "apexgantt": "^3.15.0",
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.33.2",
     "eslint-plugin-react-hooks": "^4.6.0",

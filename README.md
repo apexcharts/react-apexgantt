@@ -76,7 +76,7 @@ function App() {
     },
   ];
 
-  return <ApexGanttChart tasks={tasks} viewMode="week" height="500px" />;
+  return <ApexGanttChart tasks={tasks} pixelsPerDay={25.7} height="500px" />;
 }
 ```
 
@@ -88,10 +88,10 @@ function App() {
 | ----------- | ------------------- | ---------------------------------------------------- |
 | `tasks`     | `TaskInput[]`       | Array of tasks to display                            |
 | `options`   | `GanttUserOptions`  | ApexGantt configuration options                      |
-| `width`     | `string \| number`  | Chart width                                          |
-| `height`    | `string \| number`  | Chart height                                         |
-| `viewMode`  | `ViewMode`          | View mode: 'day', 'week', 'month', 'quarter', 'year' |
-| `theme`     | `'light' \| 'dark'` | Color theme                                          |
+| `width`        | `string \| number`  | Chart width                                                                                     |
+| `height`       | `string \| number`  | Chart height                                                                                    |
+| `pixelsPerDay` | `number`            | Continuous zoom level (pixels-per-day). Header tier is auto-picked: `0.5` ≈ year, `4.9` ≈ month, `25.7` ≈ week, `80` = day |
+| `theme`        | `'light' \| 'dark'` | Color theme                                                                                     |
 | `className` | `string`            | CSS class name                                       |
 | `style`     | `CSSProperties`     | Inline styles                                        |
 

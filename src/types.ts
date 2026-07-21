@@ -1,7 +1,6 @@
 import type {
   GanttUserOptions,
   GanttEventMap,
-  ViewMode,
   ThemeMode,
   TaskInput,
 } from "apexgantt";
@@ -11,7 +10,7 @@ import ApexGantt from "apexgantt";
  * Props for the `<ApexGanttChart>` React component.
  *
  * Pass `tasks` and an optional `options` object to render a Gantt chart.
- * Convenience props (`width`, `height`, `viewMode`, `theme`) override the
+ * Convenience props (`width`, `height`, `pixelsPerDay`, `theme`) override the
  * matching fields in `options` when both are provided.
  *
  * All `on*` callbacks receive the typed event detail — see {@link GanttEventMap}
@@ -27,8 +26,13 @@ export interface ApexGanttChartProps {
   width?: string | number;
   /** Override the chart height. Accepts CSS values (`"600px"`, `400`). */
   height?: string | number;
-  /** Override the time-scale view mode (day, week, month, etc.). */
-  viewMode?: ViewMode;
+  /**
+   * Override the continuous zoom level, in pixels-per-day. The header tier
+   * (year/quarter/month/week/day/hour/minute) is auto-picked from this value.
+   * Reference points: `0.5` ≈ year, `1.6` ≈ quarter, `4.9` ≈ month,
+   * `25.7` ≈ week, `80` = day. When omitted, the chart auto-fits the data span.
+   */
+  pixelsPerDay?: number;
   /** Override the color theme (`"light"` or `"dark"`). */
   theme?: ThemeMode;
 

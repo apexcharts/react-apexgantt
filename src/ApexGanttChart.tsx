@@ -11,7 +11,7 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       options = {},
       width,
       height,
-      viewMode,
+      pixelsPerDay,
       theme,
       onTaskUpdate,
       onTaskUpdateSuccess,
@@ -32,7 +32,7 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
     // store previous props for comparison
     const prevPropsRef = useRef<Pick<
       ApexGanttChartProps,
-      'tasks' | 'options' | 'width' | 'height' | 'viewMode' | 'theme'
+      'tasks' | 'options' | 'width' | 'height' | 'pixelsPerDay' | 'theme'
     > | null>(null);
 
     const eventHandlersRef = useRef({
@@ -93,7 +93,7 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
         series: tasks,
         ...(width !== undefined && { width }),
         ...(height !== undefined && { height }),
-        ...(viewMode !== undefined && { viewMode }),
+        ...(pixelsPerDay !== undefined && { pixelsPerDay }),
         ...(theme !== undefined && { theme }),
       };
 
@@ -101,7 +101,7 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       chartRef.current.render();
 
       // store initial props
-      prevPropsRef.current = { tasks, options, width, height, viewMode, theme };
+      prevPropsRef.current = { tasks, options, width, height, pixelsPerDay, theme };
 
       const container = containerRef.current;
 
@@ -172,27 +172,27 @@ const ApexGanttChart = forwardRef<ApexGanttHandle, ApexGanttChartProps>(
       const optionsChanged = !deepEqual(prev.options, options);
       const widthChanged = prev.width !== width;
       const heightChanged = prev.height !== height;
-      const viewModeChanged = prev.viewMode !== viewMode;
+      const pixelsPerDayChanged = prev.pixelsPerDay !== pixelsPerDay;
       const themeChanged = prev.theme !== theme;
 
-      if (!tasksChanged && !optionsChanged && !widthChanged && !heightChanged && !viewModeChanged && !themeChanged) {
+      if (!tasksChanged && !optionsChanged && !widthChanged && !heightChanged && !pixelsPerDayChanged && !themeChanged) {
         return;
       }
 
       // update stored props
-      prevPropsRef.current = { tasks, options, width, height, viewMode, theme };
+      prevPropsRef.current = { tasks, options, width, height, pixelsPerDay, theme };
 
       const ganttOptions = {
         ...options,
         series: tasks,
         ...(width !== undefined && { width }),
         ...(height !== undefined && { height }),
-        ...(viewMode !== undefined && { viewMode }),
+        ...(pixelsPerDay !== undefined && { pixelsPerDay }),
         ...(theme !== undefined && { theme }),
       };
 
       chartRef.current.update(ganttOptions);
-    }, [tasks, options, width, height, viewMode, theme]);
+    }, [tasks, options, width, height, pixelsPerDay, theme]);
 
     return (
       <div

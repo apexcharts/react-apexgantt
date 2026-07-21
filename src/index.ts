@@ -48,7 +48,6 @@ export type {
 // Value re-exports (needed at runtime)
 export {
   ApexGantt,
-  ViewMode,
   ColumnKey,
   ColumnList,
   GanttEvents,
