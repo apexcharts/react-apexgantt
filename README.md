@@ -174,7 +174,7 @@ Using a different framework? Use the dedicated wrapper — all share the same co
 
 ## License
 
-See [LICENSE](LICENSE) for details. Commercial licenses available at [apexcharts.com/pricing](https://apexcharts.com/pricing/).
+See [LICENSE](LICENSE.md) for details. Commercial licenses available at [apexcharts.com/pricing](https://apexcharts.com/pricing/).
 
 ## About
 
