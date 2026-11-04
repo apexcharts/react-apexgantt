@@ -1,11 +1,12 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ApexGanttChart,
   TaskInput,
-  ViewMode,
   TaskDraggedEventDetail,
   TaskResizedEventDetail,
   TaskUpdateSuccessEventDetail,
+  TaskProgressChangedEventDetail,
+  HistoryChangeEventDetail,
 } from 'react-apexgantt';
 
 interface EventLog {
@@ -15,38 +16,48 @@ interface EventLog {
   timestamp: string;
 }
 
+const tasks: TaskInput[] = [
+  {
+    id: 'task-1',
+    name: 'Project Planning',
+    startTime: '01-01-2024',
+    endTime: '01-08-2024',
+    progress: 75,
+  },
+  {
+    id: 'task-2',
+    name: 'Development',
+    startTime: '01-09-2024',
+    endTime: '01-20-2024',
+    progress: 40,
+    dependency: 'task-1',
+  },
+  {
+    id: 'task-3',
+    name: 'Testing',
+    startTime: '01-21-2024',
+    endTime: '01-28-2024',
+    progress: 20,
+    dependency: 'task-2',
+  },
+];
+
+const chartOptions = {
+  enableTaskDrag: true,
+  enableTaskResize: true,
+  enableTaskEdit: true,
+};
+
 const EventsExample: React.FC = () => {
   const [eventLogs, setEventLogs] = useState<EventLog[]>([]);
+  // one edit fires several events in the same millisecond, so ids come from a counter
+  const nextLogId = useRef(0);
 
-  const tasks: TaskInput[] = [
-    {
-      id: 'task-1',
-      name: 'Project Planning',
-      startTime: '01-01-2024',
-      endTime: '01-08-2024',
-      progress: 75,
-    },
-    {
-      id: 'task-2',
-      name: 'Development',
-      startTime: '01-09-2024',
-      endTime: '01-20-2024',
-      progress: 40,
-      dependency: 'task-1',
-    },
-    {
-      id: 'task-3',
-      name: 'Testing',
-      startTime: '01-21-2024',
-      endTime: '01-28-2024',
-      progress: 20,
-      dependency: 'task-2',
-    },
-  ];
-
+  // Inline handlers are fine: the chart reads them at dispatch time, so a new
+  // identity on every render neither re-subscribes nor updates the chart.
   const addLog = (type: string, message: string) => {
     const log: EventLog = {
-      id: Date.now(),
+      id: nextLogId.current++,
       type,
       message,
       timestamp: new Date().toLocaleTimeString(),
@@ -72,6 +83,14 @@ const EventsExample: React.FC = () => {
     addLog('update', `Task ${detail.taskId} updated successfully`);
   };
 
+  const handleTaskProgressChanged = (detail: TaskProgressChangedEventDetail) => {
+    addLog('progress', `Task ${detail.taskId} progress ${detail.oldProgress}% → ${detail.newProgress}%`);
+  };
+
+  const handleHistoryChange = (detail: HistoryChangeEventDetail) => {
+    addLog('history', `History ${detail.kind}: ${detail.undoSize} undo, ${detail.redoSize} redo`);
+  };
+
   const clearLogs = () => {
     setEventLogs([]);
   };
@@ -81,23 +100,21 @@ const EventsExample: React.FC = () => {
       <div style={{ marginBottom: '20px' }}>
         <h2>Events & Interactions</h2>
         <p style={{ color: '#666', marginBottom: '15px' }}>
-          Try dragging tasks or resizing them by dragging the handles
+          Try dragging tasks, resizing them by their handles, or dragging the progress handle
         </p>
       </div>
 
       <ApexGanttChart
         tasks={tasks}
-        viewMode={ViewMode.Week}
+        pixelsPerDay={25.7}
         theme="light"
         height="400px"
         onTaskDragged={handleTaskDragged}
         onTaskResized={handleTaskResized}
         onTaskUpdateSuccess={handleTaskUpdateSuccess}
-        options={{
-          enableTaskDrag: true,
-          enableTaskResize: true,
-          enableTaskEdit: true,
-        }}
+        onTaskProgressChanged={handleTaskProgressChanged}
+        onHistoryChange={handleHistoryChange}
+        options={chartOptions}
       />
 
       <div style={{ marginTop: '30px' }}>

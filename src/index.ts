@@ -13,7 +13,6 @@ export type {
   // Task model
   TaskInput,
   Task,
-  TaskType,
   TaskDependency,
   DependencyType,
   BaselineInput,
@@ -23,7 +22,6 @@ export type {
 
   // Annotations
   Annotation,
-  Orientation,
 
   // Toolbar
   ToolbarItem,
@@ -33,19 +31,31 @@ export type {
   ToolbarContext,
   ColumnListItem,
 
-  // Typed event map and detail interfaces
+  // Typed event map and one detail type per event
   GanttEventMap,
   TaskUpdateEventDetail,
   TaskUpdateSuccessEventDetail,
   TaskUpdateErrorEventDetail,
   TaskValidationErrorEventDetail,
+  TaskAddedEventDetail,
+  TaskDeletedEventDetail,
+  TaskMovedEventDetail,
+  DependencyChangeEventDetail,
   TaskDraggedEventDetail,
   TaskResizedEventDetail,
+  TaskProgressChangedEventDetail,
   SelectionChangeEventDetail,
   DependencyArrowUpdateDetail,
+  HistoryChangeEventDetail,
+  SortChangeEventDetail,
+  FilterChangeEventDetail,
+  GroupChangeEventDetail,
+  ColumnResizeEventDetail,
+  ColumnReorderEventDetail,
 } from "apexgantt";
 
-// Value re-exports (needed at runtime)
+// Value re-exports (needed at runtime). TaskType and Orientation are enums,
+// so they are values: `type: TaskType.Milestone` needs the runtime object.
 export {
   ApexGantt,
   ColumnKey,
@@ -55,7 +65,11 @@ export {
   DarkTheme,
   getTheme,
   DataParser,
+  TaskType,
+  Orientation,
 } from "apexgantt";
 
 // Wrapper-specific types
 export type { ApexGanttChartProps, ApexGanttHandle } from "./types";
+export type { GanttEventHandlers, GanttEventName } from "./events";
+export type { UseGanttEventsResult } from "./hooks/useGanttEvents";

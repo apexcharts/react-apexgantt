@@ -1,34 +1,34 @@
 import React, { useRef } from 'react';
-import { ApexGanttChart, ApexGanttHandle, TaskInput, ViewMode } from 'react-apexgantt';
+import { ApexGanttChart, ApexGanttHandle, TaskInput } from 'react-apexgantt';
+
+const tasks: TaskInput[] = [
+  {
+    id: 'task-1',
+    name: 'Project Planning',
+    startTime: '01-01-2024',
+    endTime: '01-08-2024',
+    progress: 75,
+  },
+  {
+    id: 'task-2',
+    name: 'Development',
+    startTime: '01-09-2024',
+    endTime: '01-20-2024',
+    progress: 40,
+    dependency: 'task-1',
+  },
+  {
+    id: 'task-3',
+    name: 'Testing',
+    startTime: '01-21-2024',
+    endTime: '01-25-2024',
+    progress: 0,
+    dependency: 'task-2',
+  },
+];
 
 const BasicExample: React.FC = () => {
   const ganttRef = useRef<ApexGanttHandle>(null);
-
-  const tasks: TaskInput[] = [
-    {
-      id: 'task-1',
-      name: 'Project Planning',
-      startTime: '01-01-2024',
-      endTime: '01-08-2024',
-      progress: 75,
-    },
-    {
-      id: 'task-2',
-      name: 'Development',
-      startTime: '01-09-2024',
-      endTime: '01-20-2024',
-      progress: 40,
-      dependency: 'task-1',
-    },
-    {
-      id: 'task-3',
-      name: 'Testing',
-      startTime: '01-21-2024',
-      endTime: '01-25-2024',
-      progress: 0,
-      dependency: 'task-2',
-    },
-  ];
 
   const handleZoomIn = () => {
     ganttRef.current?.zoomIn();
@@ -54,7 +54,7 @@ const BasicExample: React.FC = () => {
       <ApexGanttChart
         ref={ganttRef}
         tasks={tasks}
-        viewMode={ViewMode.Week}
+        pixelsPerDay={25.7}
         theme="light"
         height="400px"
       />

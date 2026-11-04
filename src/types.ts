@@ -1,10 +1,6 @@
-import type {
-  GanttUserOptions,
-  GanttEventMap,
-  ThemeMode,
-  TaskInput,
-} from "apexgantt";
-import ApexGantt from "apexgantt";
+import type { GanttUserOptions, ThemeMode, TaskInput } from "apexgantt";
+import type ApexGantt from "apexgantt";
+import type { GanttEventHandlers } from "./events";
 
 /**
  * Props for the `<ApexGanttChart>` React component.
@@ -13,11 +9,22 @@ import ApexGantt from "apexgantt";
  * Convenience props (`width`, `height`, `pixelsPerDay`, `theme`) override the
  * matching fields in `options` when both are provided.
  *
- * All `on*` callbacks receive the typed event detail — see {@link GanttEventMap}
- * for the full event-to-detail mapping.
+ * On a re-render the component calls the core `update()` with only what
+ * changed: `series` only when `tasks` changed, and only the option keys whose
+ * value changed. Functions compare by identity, so memoise `options` objects
+ * that hold callbacks (`useMemo`, `useCallback` or module scope) to avoid
+ * resending them on every render.
+ *
+ * Every `on*` callback receives the typed event detail; see
+ * {@link GanttEventHandlers} for one prop per chart event.
  */
-export interface ApexGanttChartProps {
-  /** Array of tasks to render in the chart. */
+export interface ApexGanttChartProps extends GanttEventHandlers {
+  /**
+   * Tasks to render. Compared deeply between renders: a changed array is
+   * sent to the chart as `series`, which replaces its data and clears undo
+   * history. An unchanged array is not resent, so edits made in the chart
+   * are kept (apexgantt 3.20.0 and later).
+   */
   tasks: TaskInput[];
   /** Chart configuration (everything except `series`, which is derived from `tasks`). */
   options?: Omit<GanttUserOptions, "series">;
@@ -27,41 +34,19 @@ export interface ApexGanttChartProps {
   /** Override the chart height. Accepts CSS values (`"600px"`, `400`). */
   height?: string | number;
   /**
-   * Override the continuous zoom level, in pixels-per-day. The header tier
-   * (year/quarter/month/week/day/hour/minute) is auto-picked from this value.
-   * Reference points: `0.5` ≈ year, `1.6` ≈ quarter, `4.9` ≈ month,
-   * `25.7` ≈ week, `80` = day. When omitted, the chart auto-fits the data span.
+   * Override the continuous zoom level, in pixels per day. The header levels
+   * (year, quarter, month, week, day, hour, minute) follow from this value.
+   * Reference points: `0.5` years, `1.6` quarters, `4.9` months, `25.7`
+   * weeks, `80` days. When omitted, the chart fits the data span.
    */
   pixelsPerDay?: number;
-  /** Override the color theme (`"light"` or `"dark"`). */
+  /**
+   * Override the colour theme (`"light"` or `"dark"`). A change also resends
+   * the theme colours set in `options` (`barBackgroundColor` and the rest),
+   * which a theme switch would otherwise reset to the new theme's defaults
+   * (apexgantt 3.20.0 and later).
+   */
   theme?: ThemeMode;
-
-  /** Fires when a task is being updated (before completion). */
-  onTaskUpdate?: (detail: GanttEventMap["taskUpdate"]["detail"]) => void;
-  /** Fires after a task update completes successfully. */
-  onTaskUpdateSuccess?: (
-    detail: GanttEventMap["taskUpdateSuccess"]["detail"],
-  ) => void;
-  /** Fires when a task update fails with an error. */
-  onTaskUpdateError?: (
-    detail: GanttEventMap["taskUpdateError"]["detail"],
-  ) => void;
-  /** Fires when task form validation fails. */
-  onTaskValidationError?: (
-    detail: GanttEventMap["taskValidationError"]["detail"],
-  ) => void;
-  /** Fires when a task bar is dragged to a new position. */
-  onTaskDragged?: (detail: GanttEventMap["taskDragged"]["detail"]) => void;
-  /** Fires when a task bar is resized via its handles. */
-  onTaskResized?: (detail: GanttEventMap["taskResized"]["detail"]) => void;
-  /** Fires when the set of selected tasks changes. */
-  onSelectionChange?: (
-    detail: GanttEventMap["selectionChange"]["detail"],
-  ) => void;
-  /** Fires when a dependency arrow is created, moved, or deleted. */
-  onDependencyArrowUpdate?: (
-    detail: GanttEventMap["dependencyArrowUpdate"]["detail"],
-  ) => void;
 
   /** CSS class name applied to the wrapper `<div>`. */
   className?: string;
@@ -73,27 +58,40 @@ export interface ApexGanttChartProps {
  * Imperative handle returned by `ref` on `<ApexGanttChart>`.
  *
  * Use `React.useRef<ApexGanttHandle>(null)` and pass it as `ref` to access
- * these methods after the chart mounts.
+ * these methods after the chart mounts. Every other core method is
+ * available on `getInstance()`.
  *
  * @example
  * ```tsx
  * const ganttRef = useRef<ApexGanttHandle>(null);
  * <ApexGanttChart ref={ganttRef} tasks={tasks} />
- * // later…
+ * // later
  * ganttRef.current?.zoomIn();
  * ```
  */
 export interface ApexGanttHandle {
-  /** Replace the entire chart configuration and re-render. */
-  update: (options: GanttUserOptions) => void;
+  /**
+   * Merge the given options into the chart and re-render. Pass only the keys
+   * to change. From apexgantt 3.20.0 an update without `series` keeps the
+   * user's edits; passing `series` replaces the data and clears undo history.
+   * The object is passed through as it is, so a `theme` switched here resets
+   * the theme colours it does not also carry.
+   */
+  update: (options: Partial<GanttUserOptions>) => void;
   /** Update a single task by ID with a partial set of fields. */
   updateTask: (taskId: string, taskData: Partial<TaskInput>) => void;
-  /** Zoom in one level on the time scale. */
+  /** Zoom in one step on the time scale. */
   zoomIn: () => void;
-  /** Zoom out one level on the time scale. */
+  /** Zoom out one step on the time scale. */
   zoomOut: () => void;
-  /** Destroy the chart instance and clean up DOM / listeners. */
+  /**
+   * Destroy the chart instance and clean up DOM and listeners. The component
+   * stops forwarding prop changes afterwards; remount it to get a new chart.
+   */
   destroy: () => void;
-  /** Access the underlying `ApexGantt` instance (or `null` before mount). */
+  /**
+   * The underlying `ApexGantt` instance, or `null` before mount and after
+   * `destroy()`. Use it for every core method the handle does not wrap.
+   */
   getInstance: () => ApexGantt | null;
 }
