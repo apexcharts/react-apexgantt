@@ -52,6 +52,15 @@ export type {
   GroupChangeEventDetail,
   ColumnResizeEventDetail,
   ColumnReorderEventDetail,
+
+  // apexgantt 3.20: dependency links, update options, scrolling and tooltips
+  DependencyLink,
+  TaskUpdateSource,
+  GanttUpdateOptions,
+  ScrollToTaskOptions,
+  UpdateTaskOptions,
+  TooltipTemplate,
+  TooltipTemplateContext,
 } from "apexgantt";
 
 // Value re-exports (needed at runtime). TaskType and Orientation are enums,
