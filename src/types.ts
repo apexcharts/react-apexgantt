@@ -1,4 +1,4 @@
-import type { GanttUserOptions, ThemeMode, TaskInput } from "apexgantt";
+import type { GanttUserOptions, TaskInput } from "apexgantt";
 import type ApexGantt from "apexgantt";
 import type { GanttEventHandlers } from "./events";
 
@@ -41,12 +41,15 @@ export interface ApexGanttChartProps extends GanttEventHandlers {
    */
   pixelsPerDay?: number;
   /**
-   * Override the colour theme (`"light"` or `"dark"`). A change also resends
-   * the theme colours set in `options` (`barBackgroundColor` and the rest),
-   * which a theme switch would otherwise reset to the new theme's defaults
-   * (apexgantt 3.20.0 and later).
+   * Override the colour theme: `"light"`, `"dark"`, or the name of a theme
+   * registered on the family registry (apexgantt 3.21.0 and later). Leave it
+   * out and the chart is light, or follows the dark variant of a design
+   * system loaded on the page (the `apexgantt/ignite-ui` add-on). A change
+   * also resends the theme colours set in `options` (`barBackgroundColor`
+   * and the rest), which a theme switch would otherwise reset to the new
+   * theme's defaults (apexgantt 3.20.0 and later).
    */
-  theme?: ThemeMode;
+  theme?: NonNullable<GanttUserOptions["theme"]>;
 
   /** CSS class name applied to the wrapper `<div>`. */
   className?: string;

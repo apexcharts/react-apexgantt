@@ -16,7 +16,7 @@ function render(props: {
   width?: string | number;
   height?: string | number;
   pixelsPerDay?: number;
-  theme?: "light" | "dark";
+  theme?: string;
   tasks?: typeof TASKS;
 }) {
   return {
@@ -83,5 +83,26 @@ describe("updatePayload", () => {
     const next = [...TASKS, { id: "t3", name: "Three", startTime: "01-10-2026", endTime: "01-12-2026" }];
     assert.deepEqual(updatePayload(render({ options }), render({ options, tasks: [...TASKS] })), {});
     assert.deepEqual(updatePayload(render({ options }), render({ options, tasks: next })), { series: next });
+  });
+});
+
+// An unset theme must stay out of the options, or a design system's dark
+// variant (the apexgantt/ignite-ui add-on) could never win over it.
+describe("resolveOptions theme", () => {
+  it("leaves theme out when neither the prop nor options set it", () => {
+    const resolved = resolveOptions({ rowHeight: 40 }, undefined, undefined, undefined, undefined);
+    assert.equal("theme" in resolved, false);
+  });
+
+  it("keeps options.theme when the prop is unset", () => {
+    assert.equal(resolveOptions({ theme: "dark" }, undefined, undefined, undefined, undefined).theme, "dark");
+  });
+
+  it("passes a registered theme name through", () => {
+    assert.equal(resolveOptions({}, undefined, undefined, undefined, "dusk").theme, "dusk");
+  });
+
+  it("sends no theme when other props change and theme was never set", () => {
+    assert.deepEqual(updatePayload(render({ width: 600 }), render({ width: 800 })), { width: 800 });
   });
 });

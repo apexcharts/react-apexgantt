@@ -87,7 +87,7 @@ function App() {
 | `width`        | `string \| number`                  | Chart width. Overrides `options.width`. |
 | `height`       | `string \| number`                  | Chart height. Overrides `options.height`. |
 | `pixelsPerDay` | `number`                            | Continuous zoom level in pixels per day. The header levels follow from it: `0.5` years, `1.6` quarters, `4.9` months, `25.7` weeks, `80` days. When omitted, the chart fits the data span. Overrides `options.pixelsPerDay`. |
-| `theme`        | `'light' \| 'dark'`                 | Colour theme. Overrides `options.theme`. |
+| `theme`        | `'light' \| 'dark' \| string`       | Colour theme, or the name of a registered theme (from ApexGantt 3.21.0). Overrides `options.theme`. Left unset, the chart is light, or follows the dark variant of an Ignite UI theme (see [Using with Ignite UI](#using-with-ignite-ui)). |
 | `className`    | `string`                            | CSS class name for the wrapper `<div>`. |
 | `style`        | `CSSProperties`                     | Inline styles for the wrapper `<div>`. |
 | `ref`          | `Ref<ApexGanttHandle>`              | Imperative handle, see [Ref methods](#ref-methods). |
@@ -233,6 +233,23 @@ const events = useGanttEvents({
 ```
 
 `<ApexGanttChart>` already reads its callbacks when an event fires, so the hook is not needed to stop re-subscribing. Use it when the same callbacks also go to memoised children or into effect dependencies. The result also carries the earlier names `handleTaskUpdate`, `handleTaskDragged` and `handleTaskResized`, now deprecated in favour of the matching `on*` keys.
+
+## Using with Ignite UI
+
+From ApexGantt 3.21.0 the chart can follow an Ignite UI theme loaded on the page: bars, text, gridlines, the header, the tooltip, the font, and light or dark. The theming is a free add-on in the `apexgantt` package. Import it once, before the first chart renders:
+
+```tsx
+// main.tsx
+import "apexgantt/ignite-ui";
+```
+
+Without a bundler, load `apexgantt.ignite-ui.min.js` with a script tag, before or after `apexgantt.min.js`.
+
+- Leave `theme` and `backgroundColor` unset (the `theme` prop and both keys in `options`) to follow the Ignite UI variant: a dark Ignite UI theme gives the chart its dark colours. A `theme` or `backgroundColor` you set wins over the variant.
+- `theme` also takes the name of a theme registered with `registerTheme` from the `apex-commons` package (`import { registerTheme } from 'apex-commons'`). The registry is shared by every Apex product on the page; the ApexGantt README ("Named themes") lists the tokens a theme can set.
+- An option you pass, an `--apex-gantt-*` variable and an `--apx-*` token all win over the Ignite UI tokens.
+- `options={{ designSystem: false }}` turns the add-on off for one chart; `options={{ tokens: false }}` stops the chart reading the `--apx-*` tokens and the design system.
+- There is no `refreshTokens()`: the chart reads the tokens each time it renders, so after swapping the Ignite UI stylesheet call `ganttRef.current?.getInstance()?.render()` (any prop change that updates the chart does the same).
 
 ## TypeScript
 
