@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # npm test runs the .ts tests on Node's built-in type stripping, which
+      # needs Node 22.18 or later.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: "npm"
+
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run build
+      - run: npm test
+
+      # The packed package must load through both entry points of its exports
+      # map: `require` (dist/index.cjs) and `import` (dist/index.js). The
+      # require check leaves out the re-exported `ApexGantt` class: apexgantt's
+      # own `require` entry is a UMD `.js` in a `"type": "module"` package, so
+      # Node loads it as an ES module that exports nothing.
+      - name: Load the packed package with require and import
+        run: |
+          npm pack --pack-destination "$RUNNER_TEMP"
+          mkdir "$RUNNER_TEMP/consumer"
+          cd "$RUNNER_TEMP/consumer"
+          npm init -y > /dev/null
+          npm install --no-audit --no-fund "$RUNNER_TEMP"/react-apexgantt-*.tgz react@18 react-dom@18 apexgantt
+          node -e "const m = require('react-apexgantt'); if (!m.ApexGanttChart || !m.setApexGanttLicense) throw new Error('require: missing exports ' + Object.keys(m));"
+          node --input-type=module -e "import { ApexGanttChart, ApexGantt, setApexGanttLicense } from 'react-apexgantt'; if (!ApexGanttChart || typeof ApexGantt !== 'function' || !setApexGanttLicense) throw new Error('import: missing exports');"
