@@ -3,14 +3,27 @@
   "type": "module",
   "version": "1.3.0",
   "description": "React wrapper for ApexGantt - A JavaScript library to create Gantt diagrams",
-  "main": "dist/index.js",
-  "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "rollup -c",
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && rollup -c && node scripts/dual-types.mjs",
     "dev": "rollup -c -w",
     "lint": "eslint src --ext .ts,.tsx",
     "typecheck": "tsc --noEmit",
