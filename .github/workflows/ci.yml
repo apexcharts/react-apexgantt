@@ -34,9 +34,11 @@ jobs:
 
       # The packed package must load through both entry points of its exports
       # map: `require` (dist/index.cjs) and `import` (dist/index.js). The
-      # require check leaves out the re-exported `ApexGantt` class: apexgantt's
-      # own `require` entry is a UMD `.js` in a `"type": "module"` package, so
-      # Node loads it as an ES module that exports nothing.
+      # require check covers only the wrapper's own exports. Every value
+      # re-exported from apexgantt (`ApexGantt`, `TaskType`, `Orientation` and
+      # the rest) is undefined under require: apexgantt's own `require` entry is
+      # a UMD `.js` in a `"type": "module"` package, so Node loads it as an ES
+      # module that exports nothing. That is fixed in apexgantt, not here.
       - name: Load the packed package with require and import
         run: |
           npm pack --pack-destination "$RUNNER_TEMP"
