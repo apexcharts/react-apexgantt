@@ -1,4 +1,4 @@
-import type { GanttUserOptions, TaskInput } from "apexgantt";
+import type { GanttTheme, GanttUserOptions, TaskInput } from "apexgantt";
 import type { ApexGanttChartProps } from "./types";
 
 /** Chart options as the component last resolved them, without `series`. */
@@ -27,8 +27,13 @@ export function resolveOptions(
 /**
  * The colour options a theme owns. When `update()` switches the theme
  * (apexgantt 3.20.0 and later), each of these that the same call does not
- * pass goes back to the new theme's default. Kept in step with the core's
- * theme defaults table.
+ * pass goes back to the new theme's default.
+ *
+ * A copy, because the core's own table (`LightThemeDefaults`) is internal.
+ * Two checks keep it in step: `ThemeColorKeysInSync` below fails
+ * `npm run typecheck` when a colour that `GanttTheme` shares with
+ * `GanttUserOptions` is missing here, and test/theme-color-keys.test.ts
+ * fails when the list differs from the core's `LightTheme` preset.
  */
 export const THEME_COLOR_KEYS = [
   "annotationBgColor",
@@ -49,7 +54,18 @@ export const THEME_COLOR_KEYS = [
   "summaryBarColor",
   "tooltipBGColor",
   "tooltipBorderColor",
-] as const satisfies ReadonlyArray<keyof GanttUserOptions>;
+] as const satisfies ReadonlyArray<keyof GanttUserOptions & keyof GanttTheme>;
+
+// Compile-time drift check. A colour option the core's theme preset gains
+// and THEME_COLOR_KEYS lacks makes `MissingThemeColorKey` that key's name,
+// which does not satisfy `never`: the type error names the key to add.
+type ExpectNever<T extends never> = T;
+type MissingThemeColorKey = Exclude<
+  Extract<keyof GanttTheme, keyof GanttUserOptions>,
+  (typeof THEME_COLOR_KEYS)[number]
+>;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+type ThemeColorKeysInSync = ExpectNever<MissingThemeColorKey>;
 
 /** What the chart was last given: its tasks and its resolved options. */
 export interface ChartInputs {
