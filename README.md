@@ -12,6 +12,7 @@ A React Gantt chart component for interactive project timelines. Render tasks, d
 - Continuous zoom with `pixelsPerDay`: the header levels, from minutes to years, follow automatically
 - Drag-and-drop scheduling, resizing and progress editing
 - Light and dark themes
+- Localization: a Japanese locale pack, timeline header formats, week start and fiscal years (apexgantt 3.22.0 and later)
 - A typed callback prop for every chart event, plus `useGanttData` and `useGanttEvents` hooks
 - TypeScript type definitions
 
@@ -251,9 +252,74 @@ Without a bundler, load `apexgantt.ignite-ui.min.js` with a script tag, before o
 - `options={{ designSystem: false }}` turns the add-on off for one chart; `options={{ tokens: false }}` stops the chart reading the `--apx-*` tokens and the design system.
 - There is no `refreshTokens()`: the chart reads the tokens each time it renders, so after swapping the Ignite UI stylesheet call `ganttRef.current?.getInstance()?.render()` (any prop change that updates the chart does the same).
 
+## Localization
+
+From apexgantt 3.22.0 the chart takes a locale pack, timeline header formats, a week start and a fiscal year. They are ordinary options, passed in `options` with no wrapper release needed. The peer range still accepts apexgantt 3.20.0 and 3.21.0, so upgrade the core to use them: 3.22.0 or later, and 3.23.0 or later for the behaviour described below.
+
+### Locale packs
+
+A locale pack sets a whole language at once: every message, the month and weekday names, the header word order, `YYYY/MM/DD` dates in the task list and tooltips, and Monday weeks. apexgantt ships a Japanese pack (`ja`, `status: 'reviewed'` since 3.23.1) in its own file, so the core bundle does not carry it:
+
+```tsx
+import { ApexGanttChart } from "react-apexgantt";
+import ja from "apexgantt/locales/ja"; // or: import { ja } from "apexgantt/locales/ja";
+
+<ApexGanttChart tasks={tasks} options={{ locale: { pack: ja } }} />;
+```
+
+The pack is the base layer: every `locale.*` and `calendar.*` option you set wins over it, so `locale: { pack: ja, messages: { addTask: "追加" } }` changes one message and keeps the rest of the pack.
+
+### Week start and fiscal years
+
+On its own the `ja` pack shows calendar years (`2026年`, January to December) and calendar quarters. For 年度 labels add the fiscal year yourself; April suits most Japanese organizations:
+
+```tsx
+const options = {
+  locale: { pack: ja },
+  calendar: { fiscalYearStartMonth: 4 }, // 2026年度 = April 2026 to March 2027
+};
+```
+
+The year row then reads `2026年度` and the quarters count from April. `calendar: { weekStart: 0 }` replaces the pack's Monday weeks with Sunday weeks. A `calendar` that holds only `weekStart` and `fiscalYearStartMonth` shapes the header and does not turn the working calendar on: every day stays a working day. (The 3.22.0 `ja` pack set an April fiscal year itself; from 3.23.0 it leaves that to you.)
+
+### Timeline header formats
+
+`locale.timelineHeaderFormat` replaces the labels of the header's top and sub rows, one zoom tier at a time (`minute`, `hour`, `halfday`, `day`, `week`, `month`, `quarter`, `year`). A row is a dayjs pattern string, or an array of candidates gated by cell width: each cell uses the widest candidate whose `minWidth` fits. Rows in the `fiscal` block (apexgantt 3.23.0 and later) are used instead of the same rows only while a fiscal year is in use:
+
+```tsx
+const options = {
+  locale: {
+    timelineHeaderFormat: {
+      year: { top: "YYYY年", sub: "YYYY年" },
+      quarter: { sub: [{ minWidth: 96, format: "第{fq}四半期" }, { format: "{fq}[Q]" }] },
+      week: { sub: "M/D～" },
+      fiscal: { year: { top: "{fy}年度", sub: "{fy}年度" } },
+    },
+  },
+};
+```
+
+`{fy}` and `{fq}` are the fiscal year and quarter while a fiscal year is in use, and the calendar year and quarter otherwise. A bare `Q` is the calendar quarter token, so a literal Q is escaped as `[Q]`: `"{fq}Q"` prints `11`, `22`. A row you set wins over the pack's; a row you leave unset keeps the pack's label, or the built-in one. These are the rows the `ja` pack ships, so over the pack set only the rows you change, for example `locale: { pack: ja, timelineHeaderFormat: { week: { sub: "M/D～{end:M/D}" } } }`.
+
+### Keeping options stable
+
+The component compares `options` deeply (see [How prop changes reach the chart](#how-prop-changes-reach-the-chart)), so a pack, a `calendar` and pattern strings written inline in JSX are equal on every render and send nothing. Functions compare by identity: a label function in `timelineHeaderFormat`, a function in `locale.messages` or a `calendar.holidayTooltip`, written inline, is a new function on every render, so the whole `locale` is sent and the chart re-renders on every parent render. Define such functions at module scope, or build the `options` that hold them with `useMemo`. Better still, use pattern strings, and template strings for messages (`editTaskTitle: "編集: {name}"`), which are plain data and need neither.
+
+### Switching language at run time
+
+Pass a new `options` object; only what changed is sent:
+
+```tsx
+<ApexGanttChart tasks={tasks} options={{ locale: { pack: lang === "ja" ? ja : undefined } }} />
+```
+
+`pack: undefined` returns the chart to English. The chart merges `locale` key by key, so a key you leave out of the new `locale` keeps its earlier value: set it to `undefined` as well (`messages: undefined`), or remove `locale` from `options`, which resets all of it. Remove `calendar` the same way to drop the fiscal year and your week start.
+
+See [Locale packs](https://apexcharts.com/apexgantt/docs/localization/#Locale-packs) for every pack field and the precedence rules, `locale.tag`, `dateLocale` and right-to-left layout, and the [React localization docs](https://apexcharts.com/apexgantt/docs/react-apexgantt/#Localization).
+
 ## TypeScript
 
-All types are exported from `react-apexgantt`: the options and task model (`GanttUserOptions`, `TaskInput`, `Task`, and more), the event map (`GanttEventMap`), every detail type in the [Events](#events) table, and the wrapper's own `ApexGanttChartProps`, `ApexGanttHandle`, `GanttEventHandlers`, `GanttEventName` and `UseGanttEventsResult`. The enums `TaskType`, `Orientation` and `ColumnKey` are exported as values, so `type: TaskType.Milestone` works.
+All types are exported from `react-apexgantt`: the options and task model (`GanttUserOptions`, `TaskInput`, `Task`, and more), the event map (`GanttEventMap`), every detail type in the [Events](#events) table, and the wrapper's own `ApexGanttChartProps`, `ApexGanttHandle`, `GanttEventHandlers`, `GanttEventName` and `UseGanttEventsResult`. The enums `TaskType`, `Orientation` and `ColumnKey` are exported as values, so `type: TaskType.Milestone` works. The locale types (`GanttLocalePack`, `TimelineHeaderFormat`, `CalendarOptions`, `GanttMessagesInput`) are imported from `apexgantt` 3.22.0 and later.
 
 ## Testing Examples Locally
 
