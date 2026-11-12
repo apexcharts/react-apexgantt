@@ -11,6 +11,10 @@ export default {
       format: "cjs",
       sourcemap: true,
       exports: "named",
+      // apexgantt's `require` entry is a module object whose `default` is the
+      // chart class. Without "compat", `new ApexGantt(...)` constructs the
+      // module object and throws "ApexGantt is not a constructor".
+      interop: "compat",
     },
     {
       file: "dist/index.js",

@@ -8,8 +8,9 @@
 //    so the CommonJS entry is typed as CommonJS rather than as ESM.
 import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-const DIST = new URL("../dist/", import.meta.url).pathname;
+const DIST = fileURLToPath(new URL("../dist/", import.meta.url));
 
 // `from "./x"`, `from '../x/y'` and `import("./x")`, without an extension.
 const RELATIVE = /((?:from\s+|import\s*\(\s*)["'])(\.{1,2}\/[^"']+?)(["'])/g;

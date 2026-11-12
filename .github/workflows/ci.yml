@@ -38,7 +38,10 @@ jobs:
       # re-exported from apexgantt (`ApexGantt`, `TaskType`, `Orientation` and
       # the rest) is undefined under require: apexgantt's own `require` entry is
       # a UMD `.js` in a `"type": "module"` package, so Node loads it as an ES
-      # module that exports nothing. That is fixed in apexgantt, not here.
+      # module that exports nothing. That needs a fix in apexgantt; no apexgantt
+      # release, 3.23.1 included, has one yet. Where that entry does load (Jest,
+      # CommonJS bundles), the chart class is its `default`, so the CommonJS
+      # bundle must construct `.default`, which the last check below holds.
       - name: Load the packed package with require and import
         run: |
           npm pack --pack-destination "$RUNNER_TEMP"
@@ -48,3 +51,4 @@ jobs:
           npm install --no-audit --no-fund "$RUNNER_TEMP"/react-apexgantt-*.tgz react@18 react-dom@18 apexgantt
           node -e "const m = require('react-apexgantt'); if (!m.ApexGanttChart || !m.setApexGanttLicense) throw new Error('require: missing exports ' + Object.keys(m));"
           node --input-type=module -e "import { ApexGanttChart, ApexGantt, setApexGanttLicense } from 'react-apexgantt'; if (!ApexGanttChart || typeof ApexGantt !== 'function' || !setApexGanttLicense) throw new Error('import: missing exports');"
+          node -e "const s = require('fs').readFileSync(require.resolve('react-apexgantt'), 'utf8'); if (!/new \\w+\\.default\\(containerRef/.test(s)) throw new Error('the CommonJS bundle constructs the apexgantt module object, not its default export');"
